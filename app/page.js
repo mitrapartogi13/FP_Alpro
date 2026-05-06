@@ -13,6 +13,7 @@ export default function Home() {
     todo: false,
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const [output, setOutput] = useState(`## Judul Catatan
 
   Ini adalah **contoh hasil** dari AI.
@@ -30,6 +31,36 @@ export default function Home() {
 
   const handleToggle = (key) => {
     setToggles((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleGenerate = async () => {
+    if (!rawText.trim() || isLoading) return;
+
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          rawText,
+          toggles,
+          customPrompt,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error || "Gagal generate note");
+      }
+
+      setOutput(data.markdown || "");
+    } catch (err) {
+      setError(err.message || "Terjadi kesalahan saat generate note");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -78,7 +109,8 @@ export default function Home() {
               ].map(({ key, label }) => (
                 <label
                   key={key}
-                  className="flex items-center gap-3 cursor-pointer group">
+                  className="flex items-center gap-3 cursor-pointer group"
+                >
                   <div
                     onClick={() => handleToggle(key)}
                     className={`w-4 h-4 rounded border flex items-center justify-center transition-colors
@@ -86,13 +118,15 @@ export default function Home() {
                         toggles[key]
                           ? "bg-emerald-500 border-emerald-500"
                           : "border-gray-600 group-hover:border-emerald-500"
-                      }`}>
+                      }`}
+                  >
                     {toggles[key] && (
                       <svg
                         className="w-3 h-3 text-white"
                         fill="none"
                         viewBox="0 0 24 24"
-                        stroke="currentColor">
+                        stroke="currentColor"
+                      >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -129,14 +163,22 @@ export default function Home() {
           {/* 4. Generate Button */}
           <button
             disabled={!rawText.trim() || isLoading}
+            onClick={handleGenerate}
             className={`w-full py-3 rounded-lg font-semibold text-sm transition-all
               ${
                 !rawText.trim() || isLoading
                   ? "bg-gray-800 text-gray-600 cursor-not-allowed"
                   : "bg-emerald-500 hover:bg-emerald-400 text-gray-950 cursor-pointer"
-              }`}>
+              }`}
+          >
             {isLoading ? "✦ AI is thinking..." : "✦ Generate Note"}
           </button>
+
+          {error && (
+            <p className="text-xs text-rose-400 bg-rose-950/40 border border-rose-900 rounded-lg p-2">
+              {error}
+            </p>
+          )}
         </div>
 
         {/* ===== PANEL KANAN ===== */}

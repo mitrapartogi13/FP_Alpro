@@ -11,6 +11,7 @@
   "dependencies": {
     "@google/genai": "^1.52.0",
     "@tailwindcss/typography": "^0.5.19",
+    "formidable": "^3.5.4",
     "next": "16.2.4",
     "pdf-parse": "^2.4.5",
     "react": "19.2.4",

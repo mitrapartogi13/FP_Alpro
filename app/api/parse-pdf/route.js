@@ -2,6 +2,7 @@ import "pdf-parse/worker";
 import { PDFParse } from "pdf-parse";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const MAX_PDF_SIZE = 10 * 1024 * 1024; // 10 MB
 

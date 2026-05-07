@@ -54,8 +54,20 @@ export default function Home() {
 
     try {
       const res = await fetch("/api/parse-pdf", { method: "POST", body: form });
+
+      // Pengecekan apakah response adalah JSON atau HTML Error Page
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const textError = await res.text();
+        console.error("HTML Error dari server:", textError); // Lihat detail error di Inspect > Console
+        throw new Error(
+          `Server error (${res.status}). Cek console browser untuk detail.`,
+        );
+      }
+
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Gagal membaca PDF.");
+
       setRawText(data.text);
       setPdfMeta({
         pages: data.pages,

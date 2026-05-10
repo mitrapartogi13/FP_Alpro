@@ -1,8 +1,9 @@
 // app/page.js
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import OutputPanel from "./components/OutputPanel";
+import History from "./components/History";
 
 export default function Home() {
   const [rawText, setRawText] = useState("");
@@ -25,6 +26,27 @@ export default function Home() {
   const [pdfMeta, setPdfMeta] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef(null);
+
+  // History state
+  const [history, setHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
+
+  // Load history from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("markdownHistory");
+    if (saved) {
+      try {
+        setHistory(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to load history:", e);
+      }
+    }
+  }, []);
+
+  // Save history to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("markdownHistory", JSON.stringify(history));
+  }, [history]);
 
   const handleToggle = (key) => {
     setToggles((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -115,12 +137,37 @@ export default function Home() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Gagal generate note");
-      setOutput(data.markdown || "");
+      const markdown = data.markdown || "";
+      setOutput(markdown);
+
+      // Save to history
+      const preview = markdown
+        .replace(/[#*`\[\]]/g, "")
+        .substring(0, 80)
+        .trim();
+      const title = rawText.substring(0, 40).trim() || "Untitled";
+      const newItem = {
+        id: Date.now(),
+        title,
+        preview,
+        markdown,
+        timestamp: new Date().toISOString(),
+      };
+      setHistory((prev) => [newItem, ...prev.slice(0, 49)]); // Keep last 50
     } catch (err) {
       setError(err.message || "Terjadi kesalahan saat generate note");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleLoadHistory = (item) => {
+    setOutput(item.markdown);
+    setShowHistory(false);
+  };
+
+  const handleDeleteHistory = (id) => {
+    setHistory((prev) => prev.filter((item) => item.id !== id));
   };
 
   const canGenerate = rawText.trim() && !isLoading;
@@ -149,7 +196,8 @@ export default function Home() {
                   setError("");
                 }}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors
-                  ${inputTab === "text" ? "bg-gray-700 text-gray-100" : "text-gray-500 hover:text-gray-300"}`}>
+                  ${inputTab === "text" ? "bg-gray-700 text-gray-100" : "text-gray-500 hover:text-gray-300"}`}
+              >
                 📋 Tempel Teks
               </button>
               <button
@@ -158,7 +206,8 @@ export default function Home() {
                   setError("");
                 }}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors
-                  ${inputTab === "pdf" ? "bg-gray-700 text-gray-100" : "text-gray-500 hover:text-gray-300"}`}>
+                  ${inputTab === "pdf" ? "bg-gray-700 text-gray-100" : "text-gray-500 hover:text-gray-300"}`}
+              >
                 📄 Upload PDF
               </button>
             </div>
@@ -199,7 +248,8 @@ export default function Home() {
                     className={`flex-1 min-h-36 flex flex-col items-center justify-center gap-3
                                 border-2 border-dashed rounded-xl cursor-pointer transition-all
                                 ${isDragOver ? "border-emerald-400 bg-emerald-950/20" : "border-gray-700 hover:border-gray-500 hover:bg-gray-900/50"}
-                                ${pdfStatus === "loading" ? "pointer-events-none opacity-60" : ""}`}>
+                                ${pdfStatus === "loading" ? "pointer-events-none opacity-60" : ""}`}
+                  >
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -254,7 +304,8 @@ export default function Home() {
                       <button
                         onClick={clearPdf}
                         className="text-gray-600 hover:text-rose-400 transition-colors text-xl leading-none ml-2"
-                        title="Hapus PDF">
+                        title="Hapus PDF"
+                      >
                         ×
                       </button>
                     </div>
@@ -293,17 +344,20 @@ export default function Home() {
               ].map(({ key, label }) => (
                 <label
                   key={key}
-                  className="flex items-center gap-3 cursor-pointer group">
+                  className="flex items-center gap-3 cursor-pointer group"
+                >
                   <div
                     onClick={() => handleToggle(key)}
                     className={`w-4 h-4 rounded border flex items-center justify-center transition-colors
-                      ${toggles[key] ? "bg-emerald-500 border-emerald-500" : "border-gray-600 group-hover:border-emerald-500"}`}>
+                      ${toggles[key] ? "bg-emerald-500 border-emerald-500" : "border-gray-600 group-hover:border-emerald-500"}`}
+                  >
                     {toggles[key] && (
                       <svg
                         className="w-3 h-3 text-white"
                         fill="none"
                         viewBox="0 0 24 24"
-                        stroke="currentColor">
+                        stroke="currentColor"
+                      >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -341,12 +395,14 @@ export default function Home() {
           <button
             disabled={!canGenerate}
             onClick={handleGenerate}
+            suppressHydrationWarning
             className={`w-full py-3 rounded-lg font-semibold text-sm transition-all
               ${
                 !canGenerate
                   ? "bg-gray-800 text-gray-600 cursor-not-allowed"
                   : "bg-emerald-500 hover:bg-emerald-400 text-gray-950 cursor-pointer"
-              }`}>
+              }`}
+          >
             {isLoading ? "✦ AI is thinking..." : "✦ Generate Note"}
           </button>
 
@@ -358,8 +414,27 @@ export default function Home() {
         </div>
 
         {/* PANEL KANAN */}
-        <div className="w-1/2 flex flex-col overflow-hidden p-6">
-          <OutputPanel output={output} />
+        {/* History Section */}
+        <div className="w-1/2 flex flex-col">
+          <div className="flex flex-col gap-2 p-6 pb-0">
+            <button
+              onClick={() => setShowHistory(!showHistory)}
+              className="text-sm font-semibold text-gray-300 hover:text-emerald-400 transition-colors text-left flex items-center gap-2"
+            >
+              {showHistory ? "▼" : "▶"} 📚 History ({history.length})
+            </button>
+            {showHistory && (
+              <History
+                items={history}
+                onSelect={handleLoadHistory}
+                onDelete={handleDeleteHistory}
+              />
+            )}
+          </div>
+
+          <div className="flex flex-col overflow-hidden p-6 flex-1">
+            <OutputPanel output={output} />
+          </div>
         </div>
       </div>
     </main>

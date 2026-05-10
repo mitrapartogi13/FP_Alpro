@@ -18,10 +18,10 @@ export default function Home() {
     `## Judul Catatan\n\n  Ini adalah **contoh hasil** dari AI.\n\n  ### Poin Penting\n  - Item pertama yang penting\n  - Item kedua dengan \`kode inline\`\n\n  > Ini adalah blockquote kutipan penting\n\n  ### ✅ To-Do List\n  - [ ] Task pertama\n  - [ ] Task kedua\n  `,
   );
 
-  // PDF state
-  const [inputTab, setInputTab] = useState("text"); // "text" | "pdf"
+  // pdf state
+  const [inputTab, setInputTab] = useState("text");
   const [pdfFile, setPdfFile] = useState(null);
-  const [pdfStatus, setPdfStatus] = useState(""); // "", "loading", "done", "error"
+  const [pdfStatus, setPdfStatus] = useState("");
   const [pdfMeta, setPdfMeta] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef(null);
@@ -30,7 +30,7 @@ export default function Home() {
     setToggles((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  // PDF handling
+  // pdf handling
   const processPdf = async (file) => {
     if (!file || file.type !== "application/pdf") {
       setPdfStatus("error");
@@ -55,11 +55,11 @@ export default function Home() {
     try {
       const res = await fetch("/api/parse-pdf", { method: "POST", body: form });
 
-      // Pengecekan apakah response adalah JSON atau HTML Error Page
+      // cek response
       const contentType = res.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
         const textError = await res.text();
-        console.error("HTML Error dari server:", textError); // Lihat detail error di Inspect > Console
+        console.error("HTML Error dari server:", textError);
         throw new Error(
           `Server error (${res.status}). Cek console browser untuk detail.`,
         );
@@ -102,7 +102,7 @@ export default function Home() {
     setError("");
   };
 
-  // Generate
+  // generate logic
   const handleGenerate = async () => {
     if (!rawText.trim() || isLoading) return;
     setIsLoading(true);
@@ -126,30 +126,31 @@ export default function Home() {
   const canGenerate = rawText.trim() && !isLoading;
 
   return (
-    <main className="min-h-screen bg-gray-950 text-gray-100 flex flex-col">
-      {/* HEADER */}
-      <header className="border-b border-gray-800 px-6 py-4">
-        <h1 className="text-xl font-bold text-emerald-400 tracking-tight">
-          ✦ MarkMind
+    <main className="min-h-screen bg-gradient-to-br from-gray-900 via-[#0f172a] to-black text-gray-100 flex flex-col font-sans selection:bg-blue-500/30">
+      {/* header glassmorphism */}
+      <header className="bg-white/5 backdrop-blur-md border-b border-white/10 px-8 py-5 shadow-lg z-10">
+        <h1 className="text-2xl font-black tracking-tight bg-gradient-to-br from-white via-blue-200 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(59,130,246,0.4)]">
+          Markdown Generator
         </h1>
-        <p className="text-xs text-gray-500 mt-0.5">
+        <p className="text-sm text-gray-400 mt-1 font-medium">
           Smart Markdown Note Generator
         </p>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* PANEL KIRI */}
-        <div className="w-1/2 border-r border-gray-800 p-6 flex flex-col gap-5">
-          {/* INPUT TABS */}
-          <div className="flex flex-col gap-3 flex-1">
-            <div className="flex items-center gap-1 bg-gray-900 rounded-lg p-1 w-fit">
+      {/* main content dengan padding dan gap */}
+      <div className="flex flex-1 overflow-hidden p-6 gap-6 max-w-[1600px] w-full mx-auto">
+        {/* panel kiri */}
+        <div className="w-1/2 flex flex-col gap-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-7 shadow-2xl shadow-blue-900/10 transition-all hover:shadow-blue-900/20">
+          {/* input tabs */}
+          <div className="flex flex-col gap-4 flex-1">
+            <div className="flex items-center gap-1 bg-black/30 rounded-xl p-1 w-fit border border-white/5">
               <button
                 onClick={() => {
                   setInputTab("text");
                   setError("");
                 }}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors
-                  ${inputTab === "text" ? "bg-gray-700 text-gray-100" : "text-gray-500 hover:text-gray-300"}`}>
+                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300
+                  ${inputTab === "text" ? "bg-blue-600 text-white shadow-md shadow-blue-500/20" : "text-gray-400 hover:text-gray-200 hover:bg-white/5"}`}>
                 📋 Tempel Teks
               </button>
               <button
@@ -157,22 +158,22 @@ export default function Home() {
                   setInputTab("pdf");
                   setError("");
                 }}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors
-                  ${inputTab === "pdf" ? "bg-gray-700 text-gray-100" : "text-gray-500 hover:text-gray-300"}`}>
+                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300
+                  ${inputTab === "pdf" ? "bg-blue-600 text-white shadow-md shadow-blue-500/20" : "text-gray-400 hover:text-gray-200 hover:bg-white/5"}`}>
                 📄 Upload PDF
               </button>
             </div>
 
-            {/* TAB: TEKS */}
+            {/* tab teks */}
             {inputTab === "text" && (
-              <div className="flex flex-col gap-2 flex-1">
-                <label className="text-sm font-semibold text-gray-300">
+              <div className="flex flex-col gap-2 flex-1 animate-in fade-in zoom-in-95 duration-300">
+                <label className="text-sm font-semibold text-gray-300 ml-1">
                   Teks Mentahmu
                 </label>
                 <textarea
-                  className="flex-1 bg-gray-900 border border-gray-700 rounded-lg p-3 text-sm text-gray-200
-                             placeholder-gray-600 resize-none focus:outline-none focus:border-emerald-500
-                             transition-colors min-h-48"
+                  className="flex-1 bg-black/20 border border-white/10 rounded-2xl p-4 text-sm text-gray-200
+                             placeholder-gray-500 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/50 
+                             focus:border-blue-500/50 transition-all shadow-inner backdrop-blur-sm"
                   placeholder="Tempel catatan berantakan, transkrip rapat, atau draft apapun di sini..."
                   value={rawText}
                   onChange={(e) => setRawText(e.target.value)}
@@ -180,10 +181,10 @@ export default function Home() {
               </div>
             )}
 
-            {/* TAB: PDF */}
+            {/* tab pdf */}
             {inputTab === "pdf" && (
-              <div className="flex flex-col gap-3 flex-1">
-                <label className="text-sm font-semibold text-gray-300">
+              <div className="flex flex-col gap-3 flex-1 animate-in fade-in zoom-in-95 duration-300">
+                <label className="text-sm font-semibold text-gray-300 ml-1">
                   Upload File PDF
                 </label>
 
@@ -196,10 +197,10 @@ export default function Home() {
                     }}
                     onDragLeave={() => setIsDragOver(false)}
                     onClick={() => fileInputRef.current?.click()}
-                    className={`flex-1 min-h-36 flex flex-col items-center justify-center gap-3
-                                border-2 border-dashed rounded-xl cursor-pointer transition-all
-                                ${isDragOver ? "border-emerald-400 bg-emerald-950/20" : "border-gray-700 hover:border-gray-500 hover:bg-gray-900/50"}
-                                ${pdfStatus === "loading" ? "pointer-events-none opacity-60" : ""}`}>
+                    className={`flex-1 min-h-[200px] flex flex-col items-center justify-center gap-4
+                                border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-300
+                                ${isDragOver ? "border-blue-400 bg-blue-500/10 scale-[1.02]" : "border-white/10 bg-black/20 hover:border-blue-500/50 hover:bg-white/5"}
+                                ${pdfStatus === "loading" ? "pointer-events-none opacity-70" : ""}`}>
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -209,19 +210,21 @@ export default function Home() {
                     />
                     {pdfStatus === "loading" ? (
                       <>
-                        <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-                        <p className="text-sm text-gray-400">Membaca PDF...</p>
+                        <div className="w-10 h-10 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin shadow-lg shadow-blue-500/20" />
+                        <p className="text-sm font-medium text-blue-300 animate-pulse">
+                          Membaca PDF...
+                        </p>
                       </>
                     ) : (
                       <>
-                        <div className="text-3xl">📄</div>
+                        <div className="text-4xl drop-shadow-md">📄</div>
                         <div className="text-center">
-                          <p className="text-sm text-gray-300 font-medium">
+                          <p className="text-sm text-gray-200 font-semibold">
                             {isDragOver
                               ? "Lepas file di sini"
                               : "Klik atau seret file PDF"}
                           </p>
-                          <p className="text-xs text-gray-600 mt-1">
+                          <p className="text-xs text-gray-500 mt-1">
                             Maksimal 10 MB
                           </p>
                         </div>
@@ -231,42 +234,43 @@ export default function Home() {
                 )}
 
                 {pdfStatus === "done" && pdfFile && (
-                  <div className="flex flex-col gap-3 flex-1">
-                    <div className="flex items-start justify-between bg-emerald-950/30 border border-emerald-800/50 rounded-lg p-3">
-                      <div className="flex items-start gap-2">
-                        <span className="text-lg mt-0.5">📄</span>
+                  <div className="flex flex-col gap-4 flex-1 animate-in fade-in duration-300">
+                    <div className="flex items-start justify-between bg-blue-500/10 border border-blue-500/20 backdrop-blur-md rounded-2xl p-4 shadow-inner">
+                      <div className="flex items-start gap-3">
+                        <span className="text-2xl drop-shadow-md">📄</span>
                         <div>
-                          <p className="text-sm font-medium text-emerald-300 truncate max-w-xs">
+                          <p className="text-sm font-semibold text-blue-300 truncate max-w-xs">
                             {pdfFile.name}
                           </p>
-                          <p className="text-xs text-gray-500 mt-0.5">
+                          <p className="text-xs text-gray-400 mt-1">
                             {pdfMeta?.pages} halaman
                             {pdfMeta?.title ? ` · ${pdfMeta.title}` : ""}
                             {" · "}
                             {(pdfFile.size / 1024).toFixed(0)} KB
                           </p>
-                          <p className="text-xs text-emerald-600 mt-1">
-                            ✓ {rawText.length.toLocaleString()} karakter
-                            berhasil diekstrak
+                          <p className="text-xs font-medium text-blue-400 mt-1.5 flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></span>
+                            {rawText.length.toLocaleString()} karakter
+                            terekstrak
                           </p>
                         </div>
                       </div>
                       <button
                         onClick={clearPdf}
-                        className="text-gray-600 hover:text-rose-400 transition-colors text-xl leading-none ml-2"
+                        className="w-8 h-8 flex items-center justify-center rounded-full bg-black/20 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all text-lg"
                         title="Hapus PDF">
                         ×
                       </button>
                     </div>
 
-                    <div className="flex flex-col gap-1 flex-1">
-                      <label className="text-xs text-gray-500">
-                        Teks hasil ekstrak · bisa diedit sebelum generate
+                    <div className="flex flex-col gap-2 flex-1">
+                      <label className="text-xs font-medium text-gray-500 ml-1">
+                        Teks hasil ekstrak · bisa diedit
                       </label>
                       <textarea
-                        className="flex-1 bg-gray-900 border border-gray-700 rounded-lg p-3 text-xs text-gray-400
-                                   font-mono resize-none focus:outline-none focus:border-emerald-500
-                                   transition-colors min-h-36"
+                        className="flex-1 bg-black/20 border border-white/10 rounded-2xl p-4 text-xs text-gray-300
+                                   font-mono resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/50 
+                                   focus:border-blue-500/50 transition-all shadow-inner backdrop-blur-sm min-h-[150px]"
                         value={rawText}
                         onChange={(e) => setRawText(e.target.value)}
                       />
@@ -277,12 +281,12 @@ export default function Home() {
             )}
           </div>
 
-          {/* Smart Toggles */}
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold text-gray-300">
-              ⚡ Opsi Tambahan
+          {/* smart toggles */}
+          <div className="flex flex-col gap-3 bg-white/5 border border-white/5 rounded-2xl p-4">
+            <label className="text-sm font-semibold text-gray-200 flex items-center gap-2">
+              <span className="text-blue-400">⚡</span> Opsi Tambahan
             </label>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               {[
                 { key: "summary", label: "Buatkan Ringkasan (TL;DR) di atas" },
                 { key: "flashcard", label: "Buatkan 5 Flashcard Q&A di bawah" },
@@ -293,27 +297,28 @@ export default function Home() {
               ].map(({ key, label }) => (
                 <label
                   key={key}
-                  className="flex items-center gap-3 cursor-pointer group">
+                  className="flex items-center gap-3 cursor-pointer group w-fit">
                   <div
                     onClick={() => handleToggle(key)}
-                    className={`w-4 h-4 rounded border flex items-center justify-center transition-colors
-                      ${toggles[key] ? "bg-emerald-500 border-emerald-500" : "border-gray-600 group-hover:border-emerald-500"}`}>
+                    className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all duration-300 shadow-sm
+                      ${toggles[key] ? "bg-blue-500 border-blue-500 shadow-blue-500/30" : "bg-black/20 border-white/20 group-hover:border-blue-400 group-hover:bg-blue-500/10"}`}>
                     {toggles[key] && (
                       <svg
-                        className="w-3 h-3 text-white"
+                        className="w-3.5 h-3.5 text-white animate-in zoom-in duration-200"
                         fill="none"
                         viewBox="0 0 24 24"
-                        stroke="currentColor">
+                        stroke="currentColor"
+                        strokeWidth={3}>
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          strokeWidth={3}
                           d="M5 13l4 4L19 7"
                         />
                       </svg>
                     )}
                   </div>
-                  <span className="text-sm text-gray-400 group-hover:text-gray-200 transition-colors">
+                  <span
+                    className={`text-sm transition-colors duration-300 ${toggles[key] ? "text-blue-100 font-medium" : "text-gray-400 group-hover:text-gray-200"}`}>
                     {label}
                   </span>
                 </label>
@@ -321,44 +326,56 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Custom Prompt */}
+          {/* custom prompt */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold text-gray-300">
-              🎯 Instruksi Khusus{" "}
-              <span className="text-gray-600 font-normal">(opsional)</span>
+            <label className="text-sm font-semibold text-gray-200 ml-1 flex items-center gap-2">
+              <span className="text-indigo-400">🎯</span> Instruksi Khusus{" "}
+              <span className="text-gray-500 font-normal text-xs">
+                (opsional)
+              </span>
             </label>
             <input
               type="text"
-              className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200
-                         placeholder-gray-600 focus:outline-none focus:border-emerald-500 transition-colors"
-              placeholder='Contoh: "Gunakan gaya formal" atau "Fokus ke bagian algoritma saja"'
+              className="bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-200
+                         placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 
+                         focus:border-blue-500/50 transition-all shadow-inner backdrop-blur-sm"
+              placeholder='Contoh: "Gunakan gaya formal" atau "Fokus ke bagian algoritma"'
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value)}
             />
           </div>
 
-          {/* Generate Button */}
+          {/* generate btn */}
           <button
             disabled={!canGenerate}
             onClick={handleGenerate}
-            className={`w-full py-3 rounded-lg font-semibold text-sm transition-all
+            className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2
               ${
                 !canGenerate
-                  ? "bg-gray-800 text-gray-600 cursor-not-allowed"
-                  : "bg-emerald-500 hover:bg-emerald-400 text-gray-950 cursor-pointer"
+                  ? "bg-white/5 text-gray-500 cursor-not-allowed border border-white/5"
+                  : "bg-blue-600 hover:bg-blue-500 text-white cursor-pointer shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:-translate-y-0.5 border border-blue-500/50"
               }`}>
-            {isLoading ? "✦ AI is thinking..." : "✦ Generate Note"}
+            {isLoading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span>AI is thinking...</span>
+              </>
+            ) : (
+              "✦ Generate Note"
+            )}
           </button>
 
           {error && (
-            <p className="text-xs text-rose-400 bg-rose-950/40 border border-rose-900 rounded-lg p-2">
-              {error}
-            </p>
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <p className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 backdrop-blur-sm rounded-xl p-3 flex items-center gap-2 shadow-inner">
+                <span className="text-base">⚠️</span> {error}
+              </p>
+            </div>
           )}
         </div>
 
-        {/* PANEL KANAN */}
-        <div className="w-1/2 flex flex-col overflow-hidden p-6">
+        {/* panel kanan */}
+        <div className="w-1/2 flex flex-col overflow-hidden bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl shadow-black/50">
           <OutputPanel output={output} />
         </div>
       </div>

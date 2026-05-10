@@ -1,8 +1,9 @@
 // app/page.js
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import OutputPanel from "./components/OutputPanel";
+import History from "./components/History";
 
 export default function Home() {
   const [rawText, setRawText] = useState("");
@@ -24,6 +25,27 @@ export default function Home() {
   const [pdfMeta, setPdfMeta] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef(null);
+
+  // History state
+  const [history, setHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
+
+  // Load history from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("markdownHistory");
+    if (saved) {
+      try {
+        setHistory(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to load history:", e);
+      }
+    }
+  }, []);
+
+  // Save history to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("markdownHistory", JSON.stringify(history));
+  }, [history]);
 
   const handleToggle = (key) => {
     setToggles((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -111,12 +133,37 @@ export default function Home() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Gagal generate note");
-      setOutput(data.markdown || "");
+      const markdown = data.markdown || "";
+      setOutput(markdown);
+
+      // Save to history
+      const preview = markdown
+        .replace(/[#*`\[\]]/g, "")
+        .substring(0, 80)
+        .trim();
+      const title = rawText.substring(0, 40).trim() || "Untitled";
+      const newItem = {
+        id: Date.now(),
+        title,
+        preview,
+        markdown,
+        timestamp: new Date().toISOString(),
+      };
+      setHistory((prev) => [newItem, ...prev.slice(0, 49)]); // Keep last 50
     } catch (err) {
       setError(err.message || "Terjadi kesalahan saat generate note");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleLoadHistory = (item) => {
+    setOutput(item.markdown);
+    setShowHistory(false);
+  };
+
+  const handleDeleteHistory = (id) => {
+    setHistory((prev) => prev.filter((item) => item.id !== id));
   };
 
   const canGenerate = rawText.trim() && !isLoading;
@@ -145,13 +192,15 @@ export default function Home() {
                   setError("");
                 }}
                 className={`px-4 py-2 rounded-lg text-xs font-bold transition-all duration-300 flex items-center gap-2
-                  ${inputTab === "text" ? "bg-blue-600 text-white shadow-md shadow-blue-500/20" : "text-slate-400 hover:text-slate-200"}`}>
+                  ${inputTab === "text" ? "bg-blue-600 text-white shadow-md shadow-blue-500/20" : "text-slate-400 hover:text-slate-200"}`}
+              >
                 <svg
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={2}
                   stroke="currentColor"
-                  className="w-4 h-4">
+                  className="w-4 h-4"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -166,13 +215,15 @@ export default function Home() {
                   setError("");
                 }}
                 className={`px-4 py-2 rounded-lg text-xs font-bold transition-all duration-300 flex items-center gap-2
-                  ${inputTab === "pdf" ? "bg-blue-600 text-white shadow-md shadow-blue-500/20" : "text-slate-400 hover:text-slate-200"}`}>
+                  ${inputTab === "pdf" ? "bg-blue-600 text-white shadow-md shadow-blue-500/20" : "text-slate-400 hover:text-slate-200"}`}
+              >
                 <svg
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={2}
                   stroke="currentColor"
-                  className="w-4 h-4">
+                  className="w-4 h-4"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -191,7 +242,7 @@ export default function Home() {
                 </label>
                 <textarea
                   className="flex-1 bg-black/20 border border-white/10 rounded-2xl p-4 text-sm text-slate-200
-                             placeholder-slate-500 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/50 
+                             placeholder-slate-500 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/50
                              focus:border-blue-500/50 transition-all shadow-inner backdrop-blur-sm min-h-48"
                   placeholder="Tempel catatan berantakan, transkrip rapat, atau draft apapun di sini..."
                   value={rawText}
@@ -219,7 +270,8 @@ export default function Home() {
                     className={`flex-1 min-h-36 flex flex-col items-center justify-center gap-3
                                 border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-300
                                 ${isDragOver ? "border-blue-400 bg-blue-500/10 scale-[1.02]" : "border-white/10 bg-black/20 hover:border-blue-500/50 hover:bg-white/5"}
-                                ${pdfStatus === "loading" ? "pointer-events-none opacity-70" : ""}`}>
+                                ${pdfStatus === "loading" ? "pointer-events-none opacity-70" : ""}`}
+                  >
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -241,7 +293,8 @@ export default function Home() {
                           viewBox="0 0 24 24"
                           strokeWidth={1}
                           stroke="currentColor"
-                          className="w-10 h-10 mb-1 opacity-50">
+                          className="w-10 h-10 mb-1 opacity-50"
+                        >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -272,7 +325,8 @@ export default function Home() {
                           viewBox="0 0 24 24"
                           strokeWidth={1.5}
                           stroke="currentColor"
-                          className="w-6 h-6 text-blue-400 mt-0.5">
+                          className="w-6 h-6 text-blue-400 mt-0.5"
+                        >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -298,7 +352,8 @@ export default function Home() {
                       <button
                         onClick={clearPdf}
                         className="w-6 h-6 flex items-center justify-center rounded-full bg-black/20 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all text-sm"
-                        title="Hapus PDF">
+                        title="Hapus PDF"
+                      >
                         ✕
                       </button>
                     </div>
@@ -309,7 +364,7 @@ export default function Home() {
                       </label>
                       <textarea
                         className="flex-1 bg-black/20 border border-white/10 rounded-2xl p-3 text-xs text-slate-300
-                                   font-mono resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/50 
+                                   font-mono resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/50
                                    focus:border-blue-500/50 transition-all shadow-inner backdrop-blur-sm min-h-36"
                         value={rawText}
                         onChange={(e) => setRawText(e.target.value)}
@@ -329,7 +384,8 @@ export default function Home() {
                 viewBox="0 0 24 24"
                 strokeWidth={2}
                 stroke="currentColor"
-                className="w-4 h-4 text-blue-400">
+                className="w-4 h-4 text-blue-400"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -349,18 +405,21 @@ export default function Home() {
               ].map(({ key, label }) => (
                 <label
                   key={key}
-                  className="flex items-center gap-3 cursor-pointer group w-fit">
+                  className="flex items-center gap-3 cursor-pointer group w-fit"
+                >
                   <div
                     onClick={() => handleToggle(key)}
                     className={`w-4 h-4 rounded border flex items-center justify-center transition-all duration-300
-                      ${toggles[key] ? "bg-blue-500 border-blue-500 shadow-sm shadow-blue-500/30" : "bg-black/20 border-white/20 group-hover:border-blue-400"}`}>
+                      ${toggles[key] ? "bg-blue-500 border-blue-500 shadow-sm shadow-blue-500/30" : "bg-black/20 border-white/20 group-hover:border-blue-400"}`}
+                  >
                     {toggles[key] && (
                       <svg
                         className="w-3 h-3 text-white animate-in zoom-in duration-200"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
-                        strokeWidth={3}>
+                        strokeWidth={3}
+                      >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -370,7 +429,8 @@ export default function Home() {
                     )}
                   </div>
                   <span
-                    className={`text-sm transition-colors duration-300 ${toggles[key] ? "text-blue-100 font-medium" : "text-slate-400 group-hover:text-slate-200"}`}>
+                    className={`text-sm transition-colors duration-300 ${toggles[key] ? "text-blue-100 font-medium" : "text-slate-400 group-hover:text-slate-200"}`}
+                  >
                     {label}
                   </span>
                 </label>
@@ -386,7 +446,8 @@ export default function Home() {
                 viewBox="0 0 24 24"
                 strokeWidth={2}
                 stroke="currentColor"
-                className="w-4 h-4 text-indigo-400">
+                className="w-4 h-4 text-indigo-400"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -401,7 +462,7 @@ export default function Home() {
             <input
               type="text"
               className="bg-black/20 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-200
-                         placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 
+                         placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50
                          focus:border-blue-500/50 transition-all shadow-inner backdrop-blur-sm"
               placeholder='Contoh: "Gunakan gaya formal" atau "Fokus ke bagian algoritma"'
               value={customPrompt}
@@ -413,12 +474,14 @@ export default function Home() {
           <button
             disabled={!canGenerate}
             onClick={handleGenerate}
+            suppressHydrationWarning
             className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2
               ${
                 !canGenerate
                   ? "bg-white/5 text-slate-500 cursor-not-allowed border border-white/5"
                   : "bg-blue-600 hover:bg-blue-500 text-white cursor-pointer shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:-translate-y-0.5 border border-blue-500/50"
-              }`}>
+              }`}
+          >
             {isLoading ? (
               <>
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -431,7 +494,8 @@ export default function Home() {
                   viewBox="0 0 24 24"
                   strokeWidth={2.5}
                   stroke="currentColor"
-                  className="w-4 h-4">
+                  className="w-4 h-4"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -451,7 +515,8 @@ export default function Home() {
                   viewBox="0 0 24 24"
                   strokeWidth={2}
                   stroke="currentColor"
-                  className="w-4 h-4">
+                  className="w-4 h-4"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -465,8 +530,43 @@ export default function Home() {
         </div>
 
         {/* panel kanan */}
-        <div className="w-1/2 flex flex-col overflow-hidden p-6 bg-transparent">
-          <OutputPanel output={output} />
+        {/* History Section */}
+        <div className="w-1/2 flex flex-col bg-white/2 backdrop-blur-sm">
+          <div className="flex flex-col gap-2 p-4 border-b border-white/10">
+            <button
+              onClick={() => setShowHistory(!showHistory)}
+              className="text-sm font-semibold text-slate-300 hover:text-blue-300 transition-colors text-left flex items-center gap-2 group"
+            >
+              <span className="inline-block transition-transform duration-300 group-hover:translate-x-0.5">
+                {showHistory ? "▼" : "▶"}
+              </span>
+              <svg
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-4 h-4 text-blue-400"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              History ({history.length})
+            </button>
+            {showHistory && (
+              <History
+                items={history}
+                onSelect={handleLoadHistory}
+                onDelete={handleDeleteHistory}
+              />
+            )}
+          </div>
+
+          <div className="flex flex-col overflow-hidden p-6 bg-transparent flex-1">
+            <OutputPanel output={output} />
+          </div>
         </div>
       </div>
     </main>

@@ -16,7 +16,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [output, setOutput] = useState(
-    `## Judul Catatan\n\n  Ini adalah **contoh hasil** dari AI.\n\n  ### Poin Penting\n  - Item pertama yang penting\n  - Item kedua dengan \`kode inline\`\n\n  > Ini adalah blockquote kutipan penting\n\n  ### ✅ To-Do List\n  - [ ] Task pertama\n  - [ ] Task kedua\n  `,
+    `## Judul Catatan\n\n  Ini adalah **contoh hasil** dari AI Markdown Generator.\n\n  ### Poin Penting\n  - Item pertama yang penting\n  - Item kedua dengan \`kode inline\`\n\n  > Ini adalah blockquote kutipan penting\n\n  ### ✅ To-Do List\n  - [ ] Task pertama\n  - [ ] Task kedua\n  `,
   );
 
   const [inputTab, setInputTab] = useState("text");
@@ -171,13 +171,26 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#020617] via-[#0f172a] to-[#020617] text-slate-200 font-sans selection:bg-blue-500/30 flex flex-col">
       {/* header */}
-      <header className="bg-white/5 backdrop-blur-md border-b border-white/10 px-6 py-4 shadow-lg z-10">
-        <h1 className="text-2xl font-black tracking-tight bg-gradient-to-br from-white via-blue-200 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(59,130,246,0.4)]">
-          Markdown Generator
-        </h1>
-        <p className="text-xs text-slate-400 mt-0.5 font-medium">
-          Smart Markdown Note Generator
-        </p>
+      <header className="bg-white/5 backdrop-blur-md border-b border-white/10 px-6 py-4 shadow-lg z-10 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-black tracking-tight bg-gradient-to-br from-white via-blue-200 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(59,130,246,0.4)]">
+            Markdown Generator
+          </h1>
+          <p className="text-xs text-slate-400 mt-0.5 font-medium">
+            Smart Markdown Note Generator
+          </p>
+        </div>
+        <div className="text-right flex flex-col items-end">
+          <span className="text-xs text-slate-400 font-medium mb-0.5">
+            Authors:
+          </span>
+          <span className="text-sm text-slate-200 font-semibold tracking-wide">
+            Mitra Partogi
+          </span>
+          <span className="text-sm text-slate-200 font-semibold tracking-wide">
+            Jalu Cahyo Sedinoputro
+          </span>
+        </div>
       </header>
 
       <div className="flex flex-1 overflow-hidden">
@@ -192,15 +205,13 @@ export default function Home() {
                   setError("");
                 }}
                 className={`px-4 py-2 rounded-lg text-xs font-bold transition-all duration-300 flex items-center gap-2
-                  ${inputTab === "text" ? "bg-blue-600 text-white shadow-md shadow-blue-500/20" : "text-slate-400 hover:text-slate-200"}`}
-              >
+                  ${inputTab === "text" ? "bg-blue-600 text-white shadow-md shadow-blue-500/20" : "text-slate-400 hover:text-slate-200"}`}>
                 <svg
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={2}
                   stroke="currentColor"
-                  className="w-4 h-4"
-                >
+                  className="w-4 h-4">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -215,15 +226,13 @@ export default function Home() {
                   setError("");
                 }}
                 className={`px-4 py-2 rounded-lg text-xs font-bold transition-all duration-300 flex items-center gap-2
-                  ${inputTab === "pdf" ? "bg-blue-600 text-white shadow-md shadow-blue-500/20" : "text-slate-400 hover:text-slate-200"}`}
-              >
+                  ${inputTab === "pdf" ? "bg-blue-600 text-white shadow-md shadow-blue-500/20" : "text-slate-400 hover:text-slate-200"}`}>
                 <svg
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={2}
                   stroke="currentColor"
-                  className="w-4 h-4"
-                >
+                  className="w-4 h-4">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -270,8 +279,7 @@ export default function Home() {
                     className={`flex-1 min-h-36 flex flex-col items-center justify-center gap-3
                                 border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-300
                                 ${isDragOver ? "border-blue-400 bg-blue-500/10 scale-[1.02]" : "border-white/10 bg-black/20 hover:border-blue-500/50 hover:bg-white/5"}
-                                ${pdfStatus === "loading" ? "pointer-events-none opacity-70" : ""}`}
-                  >
+                                ${pdfStatus === "loading" ? "pointer-events-none opacity-70" : ""}`}>
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -293,8 +301,7 @@ export default function Home() {
                           viewBox="0 0 24 24"
                           strokeWidth={1}
                           stroke="currentColor"
-                          className="w-10 h-10 mb-1 opacity-50"
-                        >
+                          className="w-10 h-10 mb-1 opacity-50">
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -325,8 +332,7 @@ export default function Home() {
                           viewBox="0 0 24 24"
                           strokeWidth={1.5}
                           stroke="currentColor"
-                          className="w-6 h-6 text-blue-400 mt-0.5"
-                        >
+                          className="w-6 h-6 text-blue-400 mt-0.5">
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -352,8 +358,7 @@ export default function Home() {
                       <button
                         onClick={clearPdf}
                         className="w-6 h-6 flex items-center justify-center rounded-full bg-black/20 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all text-sm"
-                        title="Hapus PDF"
-                      >
+                        title="Hapus PDF">
                         ✕
                       </button>
                     </div>
@@ -384,19 +389,24 @@ export default function Home() {
                 viewBox="0 0 24 24"
                 strokeWidth={2}
                 stroke="currentColor"
-                className="w-4 h-4 text-blue-400"
-              >
+                className="w-4 h-4 text-blue-400">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"
                 />
               </svg>
-              Opsi Tambahan
+              Opsi Tambahan{" "}
+              <span className="text-slate-500 font-normal text-xs">
+                (centang yang kamu inginkan)
+              </span>
             </label>
             <div className="flex flex-col gap-2">
               {[
-                { key: "summary", label: "Buatkan Ringkasan (TL;DR) di atas" },
+                {
+                  key: "summary",
+                  label: "Buatkan Ringkasan (TL;DR) dari teks saya",
+                },
                 { key: "flashcard", label: "Buatkan 5 Flashcard Q&A di bawah" },
                 {
                   key: "todo",
@@ -405,21 +415,18 @@ export default function Home() {
               ].map(({ key, label }) => (
                 <label
                   key={key}
-                  className="flex items-center gap-3 cursor-pointer group w-fit"
-                >
+                  onClick={() => handleToggle(key)}
+                  className="flex items-center gap-3 cursor-pointer group w-fit">
                   <div
-                    onClick={() => handleToggle(key)}
                     className={`w-4 h-4 rounded border flex items-center justify-center transition-all duration-300
-                      ${toggles[key] ? "bg-blue-500 border-blue-500 shadow-sm shadow-blue-500/30" : "bg-black/20 border-white/20 group-hover:border-blue-400"}`}
-                  >
+                      ${toggles[key] ? "bg-blue-500 border-blue-500 shadow-sm shadow-blue-500/30" : "bg-black/20 border-white/20 group-hover:border-blue-400"}`}>
                     {toggles[key] && (
                       <svg
                         className="w-3 h-3 text-white animate-in zoom-in duration-200"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
-                        strokeWidth={3}
-                      >
+                        strokeWidth={3}>
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -429,8 +436,7 @@ export default function Home() {
                     )}
                   </div>
                   <span
-                    className={`text-sm transition-colors duration-300 ${toggles[key] ? "text-blue-100 font-medium" : "text-slate-400 group-hover:text-slate-200"}`}
-                  >
+                    className={`text-sm transition-colors duration-300 ${toggles[key] ? "text-blue-100 font-medium" : "text-slate-400 group-hover:text-slate-200"}`}>
                     {label}
                   </span>
                 </label>
@@ -446,8 +452,7 @@ export default function Home() {
                 viewBox="0 0 24 24"
                 strokeWidth={2}
                 stroke="currentColor"
-                className="w-4 h-4 text-indigo-400"
-              >
+                className="w-4 h-4 text-indigo-400">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -480,8 +485,7 @@ export default function Home() {
                 !canGenerate
                   ? "bg-white/5 text-slate-500 cursor-not-allowed border border-white/5"
                   : "bg-blue-600 hover:bg-blue-500 text-white cursor-pointer shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:-translate-y-0.5 border border-blue-500/50"
-              }`}
-          >
+              }`}>
             {isLoading ? (
               <>
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -494,8 +498,7 @@ export default function Home() {
                   viewBox="0 0 24 24"
                   strokeWidth={2.5}
                   stroke="currentColor"
-                  className="w-4 h-4"
-                >
+                  className="w-4 h-4">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -515,8 +518,7 @@ export default function Home() {
                   viewBox="0 0 24 24"
                   strokeWidth={2}
                   stroke="currentColor"
-                  className="w-4 h-4"
-                >
+                  className="w-4 h-4">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -535,8 +537,7 @@ export default function Home() {
           <div className="flex flex-col gap-2 p-4 border-b border-white/10">
             <button
               onClick={() => setShowHistory(!showHistory)}
-              className="text-sm font-semibold text-slate-300 hover:text-blue-300 transition-colors text-left flex items-center gap-2 group"
-            >
+              className="text-sm font-semibold text-slate-300 hover:text-blue-300 transition-colors text-left flex items-center gap-2 group">
               <span className="inline-block transition-transform duration-300 group-hover:translate-x-0.5">
                 {showHistory ? "▼" : "▶"}
               </span>
@@ -545,8 +546,7 @@ export default function Home() {
                 viewBox="0 0 24 24"
                 strokeWidth={2}
                 stroke="currentColor"
-                className="w-4 h-4 text-blue-400"
-              >
+                className="w-4 h-4 text-blue-400">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

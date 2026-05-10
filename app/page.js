@@ -531,13 +531,29 @@ export default function Home() {
 
         {/* panel kanan */}
         {/* History Section */}
-        <div className="w-1/2 flex flex-col">
-          <div className="flex flex-col gap-2 p-6 pb-0">
+        <div className="w-1/2 flex flex-col bg-white/2 backdrop-blur-sm">
+          <div className="flex flex-col gap-2 p-4 border-b border-white/10">
             <button
               onClick={() => setShowHistory(!showHistory)}
-              className="text-sm font-semibold text-gray-300 hover:text-emerald-400 transition-colors text-left flex items-center gap-2"
+              className="text-sm font-semibold text-slate-300 hover:text-blue-300 transition-colors text-left flex items-center gap-2 group"
             >
-              {showHistory ? "▼" : "▶"} 📚 History ({history.length})
+              <span className="inline-block transition-transform duration-300 group-hover:translate-x-0.5">
+                {showHistory ? "▼" : "▶"}
+              </span>
+              <svg
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-4 h-4 text-blue-400"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              History ({history.length})
             </button>
             {showHistory && (
               <History

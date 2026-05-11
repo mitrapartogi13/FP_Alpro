@@ -171,8 +171,8 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#020617] via-[#0f172a] to-[#020617] text-slate-200 font-sans selection:bg-blue-500/30 flex flex-col">
       {/* header */}
-      <header className="bg-white/5 backdrop-blur-md border-b border-white/10 px-6 py-4 shadow-lg z-10 flex justify-between items-center">
-        <div>
+      <header className="bg-white/5 backdrop-blur-md border-b border-white/10 px-4 md:px-6 py-4 shadow-lg z-10 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-0">
+        <div className="text-center md:text-left">
           <h1 className="text-2xl font-black tracking-tight bg-gradient-to-br from-white via-blue-200 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(59,130,246,0.4)]">
             Markdown Generator
           </h1>
@@ -180,7 +180,7 @@ export default function Home() {
             Smart Markdown Note Generator
           </p>
         </div>
-        <div className="text-right flex flex-col items-end">
+        <div className="text-center md:text-right flex flex-col md:items-end items-center">
           <span className="text-xs text-slate-400 font-medium mb-0.5">
             Authors:
           </span>
@@ -193,11 +193,11 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* panel kiri */}
-        <div className="w-1/2 border-r border-white/10 p-6 flex flex-col gap-5 bg-white/[0.02] backdrop-blur-sm">
+      <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
+        {/* panel kiri (atas di mobile) */}
+        <div className="w-full lg:w-1/2 border-b lg:border-b-0 lg:border-r border-white/10 p-4 md:p-6 flex flex-col gap-5 bg-white/[0.02] backdrop-blur-sm overflow-y-auto">
           {/* input tabs */}
-          <div className="flex flex-col gap-3 flex-1">
+          <div className="flex flex-col gap-3 flex-none">
             <div className="flex items-center gap-1 bg-black/40 rounded-xl p-1 w-fit border border-white/5">
               <button
                 onClick={() => {
@@ -245,13 +245,13 @@ export default function Home() {
 
             {/* tab teks */}
             {inputTab === "text" && (
-              <div className="flex flex-col gap-2 flex-1 animate-in fade-in zoom-in-95 duration-300">
+              <div className="flex flex-col gap-2 flex-none animate-in fade-in zoom-in-95 duration-300">
                 <label className="text-sm font-semibold text-slate-300 ml-1">
                   Teks Mentahmu
                 </label>
                 <textarea
-                  className="flex-1 bg-black/20 border border-white/10 rounded-2xl p-4 text-sm text-slate-200
-                             placeholder-slate-500 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/50
+                  className="w-full bg-black/20 border border-white/10 rounded-2xl p-4 text-sm text-slate-200
+                             placeholder-slate-500 resize-y focus:outline-none focus:ring-2 focus:ring-blue-500/50
                              focus:border-blue-500/50 transition-all shadow-inner backdrop-blur-sm min-h-48"
                   placeholder="Tempel catatan berantakan, transkrip rapat, atau draft apapun di sini..."
                   value={rawText}
@@ -262,7 +262,7 @@ export default function Home() {
 
             {/* tab pdf */}
             {inputTab === "pdf" && (
-              <div className="flex flex-col gap-3 flex-1 animate-in fade-in zoom-in-95 duration-300">
+              <div className="flex flex-col gap-3 flex-none animate-in fade-in zoom-in-95 duration-300">
                 <label className="text-sm font-semibold text-slate-300 ml-1">
                   Upload File PDF
                 </label>
@@ -276,7 +276,7 @@ export default function Home() {
                     }}
                     onDragLeave={() => setIsDragOver(false)}
                     onClick={() => fileInputRef.current?.click()}
-                    className={`flex-1 min-h-36 flex flex-col items-center justify-center gap-3
+                    className={`w-full min-h-36 flex flex-col items-center justify-center gap-3
                                 border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-300
                                 ${isDragOver ? "border-blue-400 bg-blue-500/10 scale-[1.02]" : "border-white/10 bg-black/20 hover:border-blue-500/50 hover:bg-white/5"}
                                 ${pdfStatus === "loading" ? "pointer-events-none opacity-70" : ""}`}>
@@ -324,7 +324,7 @@ export default function Home() {
                 )}
 
                 {pdfStatus === "done" && pdfFile && (
-                  <div className="flex flex-col gap-3 flex-1 animate-in fade-in duration-300">
+                  <div className="flex flex-col gap-3 flex-none animate-in fade-in duration-300">
                     <div className="flex items-start justify-between bg-blue-500/10 border border-blue-500/20 backdrop-blur-md rounded-xl p-3 shadow-inner">
                       <div className="flex items-start gap-2">
                         <svg
@@ -339,8 +339,8 @@ export default function Home() {
                             d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
                           />
                         </svg>
-                        <div>
-                          <p className="text-sm font-semibold text-blue-300 truncate max-w-xs">
+                        <div className="overflow-hidden">
+                          <p className="text-sm font-semibold text-blue-300 truncate max-w-[200px] md:max-w-xs">
                             {pdfFile.name}
                           </p>
                           <p className="text-xs text-slate-400 mt-0.5">
@@ -357,19 +357,19 @@ export default function Home() {
                       </div>
                       <button
                         onClick={clearPdf}
-                        className="w-6 h-6 flex items-center justify-center rounded-full bg-black/20 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all text-sm"
+                        className="w-6 h-6 flex items-center justify-center rounded-full bg-black/20 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all text-sm shrink-0"
                         title="Hapus PDF">
                         ✕
                       </button>
                     </div>
 
-                    <div className="flex flex-col gap-1 flex-1">
+                    <div className="flex flex-col gap-1 flex-none">
                       <label className="text-xs font-medium text-slate-500 ml-1">
                         Teks hasil ekstrak · bisa diedit sebelum generate
                       </label>
                       <textarea
-                        className="flex-1 bg-black/20 border border-white/10 rounded-2xl p-3 text-xs text-slate-300
-                                   font-mono resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/50
+                        className="w-full bg-black/20 border border-white/10 rounded-2xl p-3 text-xs text-slate-300
+                                   font-mono resize-y focus:outline-none focus:ring-2 focus:ring-blue-500/50
                                    focus:border-blue-500/50 transition-all shadow-inner backdrop-blur-sm min-h-36"
                         value={rawText}
                         onChange={(e) => setRawText(e.target.value)}
@@ -418,7 +418,7 @@ export default function Home() {
                   onClick={() => handleToggle(key)}
                   className="flex items-center gap-3 cursor-pointer group w-fit">
                   <div
-                    className={`w-4 h-4 rounded border flex items-center justify-center transition-all duration-300
+                    className={`w-4 h-4 rounded border flex items-center justify-center transition-all duration-300 shrink-0
                       ${toggles[key] ? "bg-blue-500 border-blue-500 shadow-sm shadow-blue-500/30" : "bg-black/20 border-white/20 group-hover:border-blue-400"}`}>
                     {toggles[key] && (
                       <svg
@@ -518,7 +518,7 @@ export default function Home() {
                   viewBox="0 0 24 24"
                   strokeWidth={2}
                   stroke="currentColor"
-                  className="w-4 h-4">
+                  className="w-4 h-4 shrink-0">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -531,9 +531,9 @@ export default function Home() {
           )}
         </div>
 
-        {/* panel kanan */}
+        {/* panel kanan (bawah di mobile) */}
         {/* History Section */}
-        <div className="w-1/2 flex flex-col bg-white/2 backdrop-blur-sm">
+        <div className="w-full lg:w-1/2 flex flex-col bg-white/2 backdrop-blur-sm overflow-y-auto">
           <div className="flex flex-col gap-2 p-4 border-b border-white/10">
             <button
               onClick={() => setShowHistory(!showHistory)}
@@ -564,7 +564,7 @@ export default function Home() {
             )}
           </div>
 
-          <div className="flex flex-col overflow-hidden p-6 bg-transparent flex-1">
+          <div className="flex flex-col overflow-hidden p-4 md:p-6 bg-transparent flex-1">
             <OutputPanel output={output} />
           </div>
         </div>

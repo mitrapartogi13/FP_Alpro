@@ -1,4 +1,4 @@
-# Laporan Proyek Markdown Generator
+# Dokumentasi Proyek Markdown Generator
 
 ## Smart Markdown Note Generator
 

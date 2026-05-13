@@ -3,7 +3,8 @@
 ## Smart Markdown Note Generator
 
 **Nama proyek:** Markdown Generator
-**Jenis proyek:** Final Project Seleksi Admin Lab Algoritma dan Pemrograman ITS  
+
+**Jenis:** Final Project Seleksi Admin Lab Algoritma dan Pemrograman ITS  
 **Author:** Mitra Partogi dan Jalu Cahyo Sedinoputro  
 **Teknologi utama:** Next.js, Tailwind CSS, Google Gemini AI
 
